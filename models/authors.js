@@ -1,23 +1,25 @@
 const db = require("../db")();
+const COLLECTION = "authors";
 
 module.exports = () => {
-	const get = (id = null) => {
+	const get = async (id = null) => {
 		console.log("    insede authors model");
 		if (!id) {
-			return db.authors;
+			const authors = await db.get(COLLECTION);
+			return authors;
 		}
 
-		if (parseInt(id) > db.authors.length) {
-			return { error: "index out of range" };
-		}
-		return db.authors[parseInt(id) - 1];
+		const authors = await db.get(COLLECTION, { id });
+		return authors;
 	};
 
-	const add = (name) => {
-		return db.authors.push({
-			id: db.authors.length + 1,
-			name,
+	const add = async (name) => {
+		const authorCount = await db.count(COLLECTION);
+		const result = await db.add(COLLECTION, {
+			id: authorCount + 1,
+			name: name,
 		});
+		return result.result;
 	};
 
 	return {
